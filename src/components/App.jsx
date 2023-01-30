@@ -1,47 +1,49 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import { SearchBar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Modal } from './Modal/Modal';
 import { AppWrap } from './Styles';
 import { Styles } from './Styles';
 
-export class App extends Component {
-  state = {
-    searchName: '',
-    showModal: false,
-    card: {},
+export function App() {
+  const [searchName, setSearchName] = useState('');
+  const [page, setPage] = useState(1);
+  const [showModal, setShowModal] = useState(false);
+  const [card, setCard] = useState({});
+
+  const toggleModal = () => {
+    setShowModal(!showModal);
   };
 
-  toggleModal = () => {
-    this.setState({ showModal: !this.state.showModal });
+  const handleFormSubmit = searchName => {
+    setSearchName(searchName);
+    setPage(1);
   };
 
-  handleFormSubmit = searchName => {
-    this.setState({ searchName });
-  };
-
-  showPicture = evt => {
-    this.toggleModal();
+  const showPicture = evt => {
+    toggleModal();
     const card = {
       largeImageURL: evt.currentTarget.dataset.url,
       alt: evt.currentTarget.alt,
     };
-    this.setState({ card });
+    setCard(card);
   };
 
-  render() {
-    const { card, searchName } = this.state;
-    return (
-      <AppWrap>
-        {this.state.showModal && (
-          <Modal onToggle={this.toggleModal}>
-            <img src={card.largeImageURL} alt={card.alt} />
-          </Modal>
-        )}
-        <Styles></Styles>
-        <SearchBar onSubmit={this.handleFormSubmit} />
-        <ImageGallery searchName={searchName} showPicture={this.showPicture} />
-      </AppWrap>
-    );
-  }
+  return (
+    <AppWrap>
+      {showModal && (
+        <Modal onToggle={toggleModal}>
+          <img src={card.largeImageURL} alt={card.alt} />
+        </Modal>
+      )}
+      <Styles></Styles>
+      <SearchBar onSubmit={handleFormSubmit} />
+      <ImageGallery
+        searchName={searchName}
+        showPicture={showPicture}
+        page={page}
+        nextPage={() => setPage(page + 1)}
+      />
+    </AppWrap>
+  );
 }
